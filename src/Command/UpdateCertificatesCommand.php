@@ -78,6 +78,12 @@ class UpdateCertificatesCommand extends Command
                 't',
                 InputOption::VALUE_NONE,
                 'Require test certificate from staging-letsencrypt'
+            )
+            ->addOption(
+                'force-renewal',
+                'f',
+                InputOption::VALUE_NONE,
+                'Require renew certificate'
             );
     }
 
@@ -109,13 +115,15 @@ class UpdateCertificatesCommand extends Command
         /** @var bool $testCert */
         $testCert = $input->getOption('test-cert');
 
+        $forceRenewal = $input->getOption('force-renewal');
+
         $this->validateInput($email, $kongAdminUri, $domains);
 
         // Acquire certificates from certbot. This is not all-or-nothing, whatever certs we acquire come out here
         // and we defer error handling until they're stored
         try {
             $output->writeln(\sprintf('Updating certificates config for %s', $outputDomains));
-            $certificate = $this->certbot->acquireCertificate($domains, $email, $testCert);
+            $certificate = $this->certbot->acquireCertificate($domains, $email, $testCert, $forceRenewal);
 
             // Store certs into kong via the admin UI. Again, not all-or-nothing
             if ($this->kong->store($certificate, $kongAdminUri) === true) {

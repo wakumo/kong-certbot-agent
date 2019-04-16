@@ -25,8 +25,8 @@ COPY composer.* /workdir/
 RUN composer -o install --no-dev
 
 # App and crontab
-COPY . /workdir/
-RUN ln -s /workdir/crontab /var/spool/cron/crontabs/root
+# COPY . /workdir/
+# RUN ln -s /workdir/crontab /var/spool/cron/crontabs/root
 
 # Expose HTTP/HTTPS ports for certbot standalone
 EXPOSE 80 443

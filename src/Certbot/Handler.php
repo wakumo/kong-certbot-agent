@@ -60,7 +60,7 @@ class Handler
      * @return Certificate
      * @throws CertFileNotFoundException
      */
-    public function acquireCertificate(array $domains, string $email, bool $testCert): Certificate
+    public function acquireCertificate(array $domains, string $email, bool $testCert, bool $forceRenewal): Certificate
     {
         // Domains are stored by certbot in a folder named after the first domain on the list
         $firstDomain = \reset($domains);
@@ -70,8 +70,9 @@ class Handler
         }
 
         $renewCmd = \sprintf(
-            'certbot certonly %s --agree-tos --standalone --preferred-challenges http -n -m %s --expand %s',
+            'certbot certonly %s %s --agree-tos --standalone --preferred-challenges http -n -m %s --expand %s',
             $testCert ? '--test-cert' : '',
+            $forceRenewal ? '--force-renewal' : '',
             $email,
             '-d ' . implode(' -d ', $domains)
         );
